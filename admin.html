@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XOVR — Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+  <header class="site-header">
+    <a class="brand brand-small" href="index.html"><img src="assets/logo.jpeg" alt="XOVR"></a>
+    <nav><a href="index.html">View Store</a></nav>
+  </header>
+
+  <main class="admin-wrap">
+    <div class="admin-head">
+      <div>
+        <p class="eyebrow">CONTROL PANEL</p>
+        <h1>Manage XOVR</h1>
+      </div>
+      <button class="btn btn-dark" id="resetDemo">Reset demo data</button>
+    </div>
+
+    <section class="admin-card">
+      <h2>Add / Edit Product</h2>
+      <form id="productForm" class="admin-form">
+        <input type="hidden" id="productId">
+        <label>Product name<input id="name" required placeholder="XOVR Essential Tee"></label>
+        <label>Price (EGP)<input id="price" type="number" min="0" required placeholder="850"></label>
+        <label>Image URL<input id="image" placeholder="assets/product-1.jpg"></label>
+        <label>Description<textarea id="description" rows="4" placeholder="Product description"></textarea></label>
+        <label>Colors <input id="colors" placeholder="Black, White"></label>
+        <label>Sizes <input id="sizes" placeholder="S, M, L, XL"></label>
+        <div class="form-actions">
+          <button class="btn btn-dark" type="submit">SAVE PRODUCT</button>
+          <button class="btn btn-outline" type="button" id="cancelEdit">CANCEL</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-card">
+      <div class="admin-list-head"><h2>Products</h2><span id="productCount"></span></div>
+      <div id="adminProducts" class="admin-products"></div>
+    </section>
+
+    <section class="admin-card">
+      <h2>Brand settings</h2>
+      <form id="settingsForm" class="admin-form">
+        <label>Slogan<input id="slogan"></label>
+        <label>Contact email<input id="email" type="email"></label>
+        <button class="btn btn-dark" type="submit">SAVE SETTINGS</button>
+      </form>
+    </section>
+
+    <p class="admin-warning"><strong>Important:</strong> this first admin screen is a front-end demo using browser storage. Before publishing a real store, we will connect it to Supabase for secure login, database, product images and live updates.</p>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
