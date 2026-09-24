@@ -3,58 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XOVR — Admin</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="admin.css">
 </head>
-<body class="admin-body">
-  <header class="site-header">
-    <a class="brand brand-small" href="index.html"><img src="assets/logo.jpeg" alt="XOVR"></a>
-    <nav><a href="index.html">View Store</a></nav>
-  </header>
 
-  <main class="admin-wrap">
-    <div class="admin-head">
-      <div>
-        <p class="eyebrow">CONTROL PANEL</p>
-        <h1>Manage XOVR</h1>
-      </div>
-      <button class="btn btn-dark" id="resetDemo">Reset demo data</button>
-    </div>
+<body>
 
-    <section class="admin-card">
-      <h2>Add / Edit Product</h2>
-      <form id="productForm" class="admin-form">
-        <input type="hidden" id="productId">
-        <label>Product name<input id="name" required placeholder="XOVR Essential Tee"></label>
-        <label>Price (EGP)<input id="price" type="number" min="0" required placeholder="850"></label>
-        <label>Image URL<input id="image" placeholder="assets/product-1.jpg"></label>
-        <label>Description<textarea id="description" rows="4" placeholder="Product description"></textarea></label>
-        <label>Colors <input id="colors" placeholder="Black, White"></label>
-        <label>Sizes <input id="sizes" placeholder="S, M, L, XL"></label>
-        <div class="form-actions">
-          <button class="btn btn-dark" type="submit">SAVE PRODUCT</button>
-          <button class="btn btn-outline" type="button" id="cancelEdit">CANCEL</button>
-        </div>
-      </form>
+  <div class="login-box" id="loginBox">
+    <h1>ADMIN</h1>
+
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">LOGIN</button>
+
+    <p id="loginMessage"></p>
+  </div>
+
+
+  <div class="admin-panel" id="adminPanel">
+
+    <header>
+      <h1>ADMIN PANEL</h1>
+      <button onclick="logout()">LOGOUT</button>
+    </header>
+
+    <section class="add-product">
+
+      <h2>Add Product</h2>
+
+      <input type="text" id="productName" placeholder="Product Name">
+
+      <input type="number" id="productPrice" placeholder="Price">
+
+      <textarea id="productDescription"
+        placeholder="Product Description"></textarea>
+
+      <input type="text" id="productColors"
+        placeholder="Colors (Black, White, Red)">
+
+      <input type="text" id="productSizes"
+        placeholder="Sizes (S, M, L, XL)">
+
+      <label class="image-label">
+        Main Image
+        <input type="file" id="mainImage" accept="image/*">
+      </label>
+
+      <label class="image-label">
+        Additional Images
+        <input type="file" id="additionalImages"
+          accept="image/*" multiple>
+      </label>
+
+      <div id="imagePreview"></div>
+
+      <button class="save-btn" onclick="addProduct()">
+        SAVE PRODUCT
+      </button>
+
+      <p id="status"></p>
+
     </section>
 
-    <section class="admin-card">
-      <div class="admin-list-head"><h2>Products</h2><span id="productCount"></span></div>
-      <div id="adminProducts" class="admin-products"></div>
+
+    <section class="products-section">
+
+      <h2>Products</h2>
+
+      <div id="productsList"></div>
+
     </section>
 
-    <section class="admin-card">
-      <h2>Brand settings</h2>
-      <form id="settingsForm" class="admin-form">
-        <label>Slogan<input id="slogan"></label>
-        <label>Contact email<input id="email" type="email"></label>
-        <button class="btn btn-dark" type="submit">SAVE SETTINGS</button>
-      </form>
-    </section>
+  </div>
 
-    <p class="admin-warning"><strong>Important:</strong> this first admin screen is a front-end demo using browser storage. Before publishing a real store, we will connect it to Supabase for secure login, database, product images and live updates.</p>
-  </main>
 
   <script src="admin.js"></script>
+
 </body>
 </html>
