@@ -1,4 +1,4 @@
-const API_URL = "PUT_YOUR_APPS_SCRIPT_URL_HERE";
+const API_URL = "https://script.google.com/macros/s/AKfycbxYK1ig3sG2NPVFBnNBAsg-LWEoRpdbLeLXj2jgDTB-ki2KW9_u3J6AdcQ3UID4BxVO/exec";
 
 const $ = id => document.getElementById(id);
 
