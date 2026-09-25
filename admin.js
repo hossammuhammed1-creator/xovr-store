@@ -192,14 +192,13 @@ async function addProduct() {
     status.textContent = "Uploading product...";
 
 
-    const response = await fetch(API_URL, {
-
-      method: "POST",
-
-      body: JSON.stringify(product)
-
-    });
-
+const response = await fetch(API_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify(product)
+});
 
     const result = await response.json();
 
