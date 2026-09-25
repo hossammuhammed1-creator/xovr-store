@@ -257,6 +257,4 @@ async function loadProducts() {
   }
 
 }
-
-
 $("adminPanel").style.display = "none";
