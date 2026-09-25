@@ -207,3 +207,38 @@ footer{border-top:1px solid var(--line);padding:22px 5vw;display:flex;justify-co
     gap: 14px;
   }
 }
+/* XOVR - single small product card */
+
+.product-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.product-card {
+  width: min(100%, 360px);
+}
+
+.product-image-link {
+  aspect-ratio: 1 / 1.15;
+}
+
+.product-info {
+  padding: 10px 4px 0;
+}
+
+.product-info h3 {
+  font-size: 16px;
+  margin: 3px 0;
+}
+
+.product-price {
+  font-size: 13px;
+  margin: 5px 0 9px;
+}
+
+.product-order-button {
+  font-size: 10px;
+  padding: 7px 12px;
+}
