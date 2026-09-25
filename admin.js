@@ -5,20 +5,26 @@ const $ = id => document.getElementById(id);
 let mainImageFile = null;
 
 
-// IMAGE SELECTION
-$("mainImage").addEventListener("change", e => {
+// اختيار الصورة
+$("mainImage").addEventListener("change", function (e) {
   mainImageFile = e.target.files[0] || null;
+
+  if (mainImageFile) {
+    $("status").textContent =
+      "Selected: " + mainImageFile.name;
+  }
 });
 
 
-// LOGIN
+// تسجيل الدخول
 function login() {
 
   const email = $("email").value.trim();
   const password = $("password").value.trim();
 
   if (!email || !password) {
-    $("loginMessage").textContent = "Enter email and password.";
+    $("loginMessage").textContent =
+      "Enter email and password.";
     return;
   }
 
@@ -29,21 +35,23 @@ function login() {
 }
 
 
-// LOGOUT
+// تسجيل الخروج
 function logout() {
+
   $("adminPanel").style.display = "none";
   $("loginBox").style.display = "block";
+
 }
 
 
-// FILE TO BASE64
+// تحويل الصورة إلى Base64
 function fileToBase64(file) {
 
   return new Promise((resolve, reject) => {
 
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onload = function () {
 
       const result = reader.result;
 
@@ -58,18 +66,23 @@ function fileToBase64(file) {
     reader.onerror = reject;
 
     reader.readAsDataURL(file);
+
   });
+
 }
 
 
-// ADD PRODUCT
+// إضافة المنتج
 async function addProduct() {
 
   const name = $("productName").value.trim();
   const price = $("productPrice").value.trim();
-  const description = $("productDescription").value.trim();
-  const colors = $("productColors").value.trim();
-  const sizes = $("productSizes").value.trim();
+  const description =
+    $("productDescription").value.trim();
+  const colors =
+    $("productColors").value.trim();
+  const sizes =
+    $("productSizes").value.trim();
 
   const status = $("status");
 
@@ -79,44 +92,67 @@ async function addProduct() {
   }
 
   if (!price) {
-    status.textContent = "Please enter product price.";
+    status.textContent = "Please enter price.";
     return;
   }
 
   if (!mainImageFile) {
-    status.textContent = "Please choose a main image.";
+    status.textContent = "Please choose an image.";
     return;
   }
 
-  status.textContent = "Uploading product...";
+  status.textContent = "Uploading...";
 
   try {
 
     const image = await fileToBase64(mainImageFile);
 
     const product = {
+
       action: "addProduct",
+
       id: Date.now().toString(),
+
       name: name,
+
       price: Number(price),
+
       description: description,
+
       image: image,
+
       colors: colors,
+
       sizes: sizes
+
     };
 
+
     const response = await fetch(API_URL, {
+
       method: "POST",
+
       body: JSON.stringify(product)
+
     });
+
 
     const result = await response.json();
 
+
     if (!result.success) {
-      throw new Error(result.message || "Could not save product.");
+
+      throw new Error(
+        result.message ||
+        "Product could not be saved."
+      );
+
     }
 
-    status.textContent = "Product saved successfully!";
+
+    status.textContent =
+      "Product saved successfully!";
+
 
     $("productName").value = "";
     $("productPrice").value = "";
@@ -129,16 +165,20 @@ async function addProduct() {
 
     loadProducts();
 
+
   } catch (error) {
 
     console.error(error);
 
-    status.textContent = "Error: " + error.message;
+    status.textContent =
+      "Error: " + error.message;
+
   }
+
 }
 
 
-// LOAD PRODUCTS
+// تحميل المنتجات
 async function loadProducts() {
 
   const list = $("productsList");
@@ -148,41 +188,74 @@ async function loadProducts() {
   try {
 
     const response = await fetch(API_URL);
-    const products = await response.json();
+
+    const products =
+      await response.json();
 
     list.innerHTML = "";
 
     if (!products.length) {
-      list.innerHTML = "<p>No products yet.</p>";
+
+      list.innerHTML =
+        "<p>No products yet.</p>";
+
       return;
+
     }
+
 
     products.forEach(product => {
 
-      const item = document.createElement("div");
+      const item =
+        document.createElement("div");
 
-      item.className = "product-item";
+      item.className =
+        "product-item";
 
       item.innerHTML = `
-        <img src="${product.Image || ""}" alt="">
+
+        <img
+          src="${product.Image || ""}"
+          alt=""
+          style="width:100px"
+        >
+
         <div>
-          <h3>${product.Name || ""}</h3>
-          <p>${product.Price || ""}</p>
-          <p>${product.Colors || ""}</p>
-          <p>${product.Sizes || ""}</p>
+
+          <h3>
+            ${product.Name || ""}
+          </h3>
+
+          <p>
+            ${product.Price || ""}
+          </p>
+
+          <p>
+            ${product.Colors || ""}
+          </p>
+
+          <p>
+            ${product.Sizes || ""}
+          </p>
+
         </div>
+
       `;
 
       list.appendChild(item);
 
     });
 
+
   } catch (error) {
 
     console.error(error);
 
-    list.innerHTML = "<p>Could not load products.</p>";
+    list.innerHTML =
+      "<p>Could not load products.</p>";
+
   }
+
 }
 
 
