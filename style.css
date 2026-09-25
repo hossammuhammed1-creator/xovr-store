@@ -267,3 +267,37 @@ footer{border-top:1px solid var(--line);padding:22px 5vw;display:flex;justify-co
   }
 
 }
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .product-card {
+    width: 100%;
+    max-width: none;
+  }
+
+  .product-image-link {
+    aspect-ratio: 1 / 1;
+  }
+
+  .product-info {
+    padding: 7px 5px 10px;
+  }
+
+  .product-info h3 {
+    font-size: 13px;
+    margin: 2px 0;
+  }
+
+  .product-price {
+    font-size: 12px;
+    margin: 3px 0 7px;
+  }
+
+  .product-order-button {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+}
