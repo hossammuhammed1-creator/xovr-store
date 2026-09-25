@@ -194,14 +194,19 @@ async function addProduct() {
 
 const response = await fetch(API_URL, {
   method: "POST",
-  headers: {
-    "Content-Type": "text/plain;charset=utf-8"
-  },
   body: JSON.stringify(product)
 });
 
-    const result = await response.json();
+const text = await response.text();
 
+let result;
+
+try {
+  result = JSON.parse(text);
+} catch (e) {
+  console.log("Server response:", text);
+  throw new Error("Google Apps Script did not return valid JSON.");
+}
 
     if (!result.success) {
 
