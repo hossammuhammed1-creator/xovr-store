@@ -2,118 +2,36 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxYK1ig3sG2NPVFBnNBAsg-
 
 const $ = id => document.getElementById(id);
 
-let mainImageFile = null;
-let additionalImageFiles = [];
-
 
 // =========================
-// IMAGE SELECTION
+// LOGIN
 // =========================
 
-$("mainImage").addEventListener("change", e => {
+function login() {
 
-  mainImageFile = e.target.files[0] || null;
+  const email = $("email").value.trim();
+  const password = $("password").value.trim();
 
-  showPreview();
-
-});
-
-
-$("additionalImages").addEventListener("change", e => {
-
-  additionalImageFiles = Array.from(e.target.files || []);
-
-  showPreview();
-
-});
-
-
-// =========================
-// IMAGE PREVIEW
-// =========================
-
-function showPreview() {
-
-  const preview = $("imagePreview");
-
-  preview.innerHTML = "";
-
-  if (mainImageFile) {
-
-    const title = document.createElement("p");
-    title.textContent = "Main Image";
-    preview.appendChild(title);
-
-    const img = document.createElement("img");
-
-    img.src = URL.createObjectURL(mainImageFile);
-
-    img.style.width = "120px";
-    img.style.height = "120px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "10px";
-    img.style.margin = "5px";
-
-    preview.appendChild(img);
+  if (!email || !password) {
+    $("loginMessage").textContent = "Enter email and password.";
+    return;
   }
 
+  $("loginBox").style.display = "none";
+  $("adminPanel").style.display = "block";
 
-  if (additionalImageFiles.length) {
-
-    const title = document.createElement("p");
-    title.textContent = "Additional Images";
-    preview.appendChild(title);
-
-    additionalImageFiles.forEach(file => {
-
-      const img = document.createElement("img");
-
-      img.src = URL.createObjectURL(file);
-
-      img.style.width = "100px";
-      img.style.height = "100px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "10px";
-      img.style.margin = "5px";
-
-      preview.appendChild(img);
-
-    });
-
-  }
-
+  loadProducts();
 }
 
 
 // =========================
-// FILE → BASE64
+// LOGOUT
 // =========================
 
-function fileToBase64(file) {
+function logout() {
 
-  return new Promise((resolve, reject) => {
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-
-      const result = reader.result;
-
-      const base64 = result.split(",")[1];
-
-      resolve({
-        name: file.name,
-        type: file.type,
-        data: base64
-      });
-
-    };
-
-    reader.onerror = reject;
-
-    reader.readAsDataURL(file);
-
-  });
+  $("adminPanel").style.display = "none";
+  $("loginBox").style.display = "block";
 
 }
 
@@ -127,6 +45,7 @@ async function addProduct() {
   const name = $("productName").value.trim();
   const price = $("productPrice").value.trim();
   const description = $("productDescription").value.trim();
+  const image = $("productImage").value.trim();
   const colors = $("productColors").value.trim();
   const sizes = $("productSizes").value.trim();
 
@@ -142,107 +61,53 @@ async function addProduct() {
     return;
   }
 
-  if (!mainImageFile) {
-    status.textContent = "Please choose a main image.";
+  if (!image) {
+    status.textContent = "Please enter image URL.";
     return;
   }
 
+  status.textContent = "Saving product...";
 
-  status.textContent = "Preparing images...";
-
+  const product = {
+    action: "addProduct",
+    id: Date.now().toString(),
+    name: name,
+    price: Number(price),
+    description: description,
+    image: image,
+    colors: colors,
+    sizes: sizes
+  };
 
   try {
 
-    const mainImage = await fileToBase64(mainImageFile);
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(product)
+    });
 
-    const additionalImages = [];
-
-    for (const file of additionalImageFiles) {
-
-      const image = await fileToBase64(file);
-
-      additionalImages.push(image);
-
-    }
-
-
-    const product = {
-
-      action: "addProduct",
-
-      id: Date.now().toString(),
-
-      name: name,
-
-      price: Number(price),
-
-      description: description,
-
-      colors: colors,
-
-      sizes: sizes,
-
-      mainImage: mainImage,
-
-      additionalImages: additionalImages
-
-    };
-
-
-    status.textContent = "Uploading product...";
-
-
-const response = await fetch(API_URL, {
-  method: "POST",
-  body: JSON.stringify(product)
-});
-
-const text = await response.text();
-
-let result;
-
-try {
-  result = JSON.parse(text);
-} catch (e) {
-  console.log("Server response:", text);
-  throw new Error("Google Apps Script did not return valid JSON.");
-}
+    const result = await response.json();
 
     if (!result.success) {
-
-      throw new Error(
-        result.message || "Something went wrong."
-      );
-
+      throw new Error(result.message || "Could not save product.");
     }
 
-
     status.textContent = "Product saved successfully!";
-
-
-    // Reset form
 
     $("productName").value = "";
     $("productPrice").value = "";
     $("productDescription").value = "";
+    $("productImage").value = "";
     $("productColors").value = "";
     $("productSizes").value = "";
 
-    $("mainImage").value = "";
-    $("additionalImages").value = "";
-
-    $("imagePreview").innerHTML = "";
-
-    mainImageFile = null;
-    additionalImageFiles = [];
-
+    loadProducts();
 
   } catch (error) {
 
     console.error(error);
 
-    status.textContent =
-      "Error: " + error.message;
+    status.textContent = "Error: " + error.message;
 
   }
 
@@ -250,43 +115,55 @@ try {
 
 
 // =========================
-// LOGIN
+// LOAD PRODUCTS
 // =========================
 
-function login() {
+async function loadProducts() {
 
-  const email = $("email").value.trim();
-  const password = $("password").value.trim();
+  const list = $("productsList");
 
-  /*
-    هنربط نظام الدخول بعد ما نخلص
-    Google Apps Script.
-  */
+  list.innerHTML = "Loading products...";
 
-  if (!email || !password) {
+  try {
 
-    $("loginMessage").textContent =
-      "Enter email and password.";
+    const response = await fetch(API_URL);
+    const products = await response.json();
 
-    return;
+    list.innerHTML = "";
+
+    if (!products.length) {
+      list.innerHTML = "<p>No products yet.</p>";
+      return;
+    }
+
+    products.forEach(product => {
+
+      const item = document.createElement("div");
+
+      item.className = "product-item";
+
+      item.innerHTML = `
+        <img src="${product.image || ""}" alt="">
+        <div>
+          <h3>${product.name || ""}</h3>
+          <p>${product.price || ""}</p>
+          <p>${product.colors || ""}</p>
+          <p>${product.sizes || ""}</p>
+        </div>
+      `;
+
+      list.appendChild(item);
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    list.innerHTML =
+      "<p>Could not load products.</p>";
 
   }
-
-  // مؤقتًا
-  $("loginBox").style.display = "none";
-  $("adminPanel").style.display = "block";
-
-}
-
-
-// =========================
-// LOGOUT
-// =========================
-
-function logout() {
-
-  $("adminPanel").style.display = "none";
-  $("loginBox").style.display = "block";
 
 }
 
