@@ -157,3 +157,53 @@ footer{border-top:1px solid var(--line);padding:22px 5vw;display:flex;justify-co
 .admin-actions{grid-column:2}
 .admin-actions .mini-btn{flex:1}
 }
+/* XOVR Product Cards */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.product-card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.product-image-link {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info {
+  padding: 14px 4px 0;
+}
+
+.product-info h3 {
+  margin: 4px 0;
+}
+
+.product-price {
+  margin: 6px 0 12px;
+}
+
+.product-order-button {
+  display: inline-block;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
