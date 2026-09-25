@@ -3,82 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
+  <title>XOVR Admin</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
 
-  <div class="login-box" id="loginBox">
-    <h1>ADMIN</h1>
+<div class="login-box" id="loginBox">
+  <h1>XOVR ADMIN</h1>
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
 
-    <button onclick="login()">LOGIN</button>
+  <button onclick="login()">LOGIN</button>
 
-    <p id="loginMessage"></p>
-  </div>
-
-
-  <div class="admin-panel" id="adminPanel">
-
-    <header>
-      <h1>ADMIN PANEL</h1>
-      <button onclick="logout()">LOGOUT</button>
-    </header>
-
-    <section class="add-product">
-
-      <h2>Add Product</h2>
-
-      <input type="text" id="productName" placeholder="Product Name">
-
-      <input type="number" id="productPrice" placeholder="Price">
-
-      <textarea id="productDescription"
-        placeholder="Product Description"></textarea>
-
-      <input type="text" id="productColors"
-        placeholder="Colors (Black, White, Red)">
-
-      <input type="text" id="productSizes"
-        placeholder="Sizes (S, M, L, XL)">
-
-      <label class="image-label">
-        Main Image
-        <input type="file" id="mainImage" accept="image/*">
-      </label>
-
-      <label class="image-label">
-        Additional Images
-        <input type="file" id="additionalImages"
-          accept="image/*" multiple>
-      </label>
-
-      <div id="imagePreview"></div>
-
-      <button class="save-btn" onclick="addProduct()">
-        SAVE PRODUCT
-      </button>
-
-      <p id="status"></p>
-
-    </section>
+  <p id="loginMessage"></p>
+</div>
 
 
-    <section class="products-section">
+<div class="admin-panel" id="adminPanel">
 
-      <h2>Products</h2>
+  <header>
+    <h1>XOVR ADMIN PANEL</h1>
+    <button onclick="logout()">LOGOUT</button>
+  </header>
 
-      <div id="productsList"></div>
+  <section class="add-product">
 
-    </section>
+    <h2>Add Product</h2>
 
-  </div>
+    <input type="text" id="productName" placeholder="Product Name">
 
+    <input type="number" id="productPrice" placeholder="Price">
 
-  <script src="admin.js"></script>
+    <textarea id="productDescription"
+      placeholder="Product Description"></textarea>
+
+    <input type="text" id="productImage"
+      placeholder="Image URL">
+
+    <input type="text" id="productColors"
+      placeholder="Colors (Black, White, Red)">
+
+    <input type="text" id="productSizes"
+      placeholder="Sizes (S, M, L, XL)">
+
+    <button class="save-btn" onclick="addProduct()">
+      SAVE PRODUCT
+    </button>
+
+    <p id="status"></p>
+
+  </section>
+
+  <section class="products-section">
+
+    <h2>Products</h2>
+
+    <div id="productsList"></div>
+
+  </section>
+
+</div>
+
+<script src="admin.js"></script>
 
 </body>
 </html>
