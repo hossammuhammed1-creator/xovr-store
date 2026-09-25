@@ -242,7 +242,7 @@ footer{border-top:1px solid var(--line);padding:22px 5vw;display:flex;justify-co
   font-size: 9px;
   padding: 6px 10px;
 }
-@media (max-width: 600px) {
+@media (max-width: 300px) {
 
   .product-card {
     width: 70%;
