@@ -519,7 +519,7 @@ async function loadProducts() {
 
 
 // =========================
-// ORDERS
+// LOAD ORDERS
 // =========================
 
 async function loadOrders() {
@@ -573,11 +573,6 @@ async function loadOrders() {
       }
     );
 
-
-    // =========================
-    // SHOW REAL ERROR
-    // =========================
-
     if (!response.ok) {
 
       const errorText =
@@ -612,10 +607,8 @@ async function loadOrders() {
       return;
     }
 
-
     const orders =
       await response.json();
-
 
     if (!orders.length) {
 
@@ -625,9 +618,7 @@ async function loadOrders() {
       return;
     }
 
-
     list.innerHTML = "";
-
 
     orders.forEach(order => {
 
@@ -637,13 +628,11 @@ async function loadOrders() {
       item.className =
         "order-item";
 
-
       const date =
         order.created_at
           ? new Date(order.created_at)
               .toLocaleString()
           : "";
-
 
       item.innerHTML = `
 
@@ -703,6 +692,21 @@ async function loadOrders() {
             ${date}
           </p>
 
+          <button
+            onclick="deleteOrder(${order.id})"
+            style="
+              margin-top:10px;
+              padding:10px 16px;
+              background:#000;
+              color:#fff;
+              border:none;
+              border-radius:6px;
+              cursor:pointer;
+            "
+          >
+            DELETE ORDER
+          </button>
+
         </div>
 
       `;
@@ -733,6 +737,64 @@ async function loadOrders() {
       </div>
 
     `;
+  }
+}
+
+
+// =========================
+// DELETE ORDER
+// =========================
+
+async function deleteOrder(id) {
+
+  const confirmed =
+    confirm(
+      "Delete this order?\n\nThis cannot be undone."
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+
+      `${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`,
+
+      {
+        method: "DELETE",
+
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=minimal"
+        }
+      }
+    );
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(errorText);
+    }
+
+    alert("Order deleted successfully!");
+
+    loadOrders();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Could not delete order:\n\n" +
+      error.message
+    );
   }
 }
 
