@@ -158,6 +158,38 @@ async function loadProductDetails() {
 
 
     // =========================
+    // ADDITIONAL IMAGES
+    // =========================
+
+    let additionalImages = [];
+
+    if (product.images) {
+      try {
+        const parsedImages = JSON.parse(product.images);
+
+        if (Array.isArray(parsedImages)) {
+          additionalImages = parsedImages.filter(Boolean);
+        }
+      } catch (error) {
+        console.error(
+          "Could not read additional images:",
+          error
+        );
+      }
+    }
+
+
+    // =========================
+    // ALL PRODUCT IMAGES
+    // =========================
+
+    const allImages = [
+      product.image,
+      ...additionalImages
+    ].filter(Boolean);
+
+
+    // =========================
     // PRODUCT HTML
     // =========================
 
@@ -165,10 +197,43 @@ async function loadProductDetails() {
 
       <div class="product-gallery">
 
-        <img
-          src="${product.image || ""}"
-          alt="${escapeHTML(product.name || "XOVR Product")}"
-        >
+        <div class="main-product-image">
+
+          <img
+            id="mainProductImage"
+            src="${allImages[0] || ""}"
+            alt="${escapeHTML(product.name || "XOVR Product")}"
+          >
+
+        </div>
+
+
+        ${
+          allImages.length > 1
+            ? `
+              <div class="product-thumbnails">
+
+                ${allImages.map((image, index) => `
+
+                  <button
+                    type="button"
+                    class="product-thumbnail ${index === 0 ? "active" : ""}"
+                    data-image="${escapeHTML(image)}"
+                  >
+
+                    <img
+                      src="${escapeHTML(image)}"
+                      alt="${escapeHTML(product.name || "Product")}"
+                    >
+
+                  </button>
+
+                `).join("")}
+
+              </div>
+            `
+            : ""
+        }
 
       </div>
 
@@ -345,6 +410,44 @@ async function loadProductDetails() {
 
 
     // =========================
+    // IMAGE THUMBNAILS
+    // =========================
+
+    document
+      .querySelectorAll(".product-thumbnail")
+      .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+          const image =
+            button.dataset.image;
+
+          const mainImage =
+            document.getElementById(
+              "mainProductImage"
+            );
+
+          if (mainImage && image) {
+            mainImage.src = image;
+          }
+
+
+          document
+            .querySelectorAll(
+              ".product-thumbnail"
+            )
+            .forEach(btn =>
+              btn.classList.remove("active")
+            );
+
+          button.classList.add("active");
+
+        });
+
+      });
+
+
+    // =========================
     // COLOR SELECTION
     // =========================
 
@@ -439,10 +542,6 @@ async function loadProductDetails() {
         event.preventDefault();
 
 
-        // -------------------------
-        // CUSTOMER DATA
-        // -------------------------
-
         const name =
           document
             .getElementById("customerName")
@@ -464,10 +563,6 @@ async function loadProductDetails() {
             .trim();
 
 
-        // -------------------------
-        // SELECTED COLOR
-        // -------------------------
-
         const selectedColor =
           document.querySelector(
             "#colorOptions .option.active"
@@ -479,10 +574,6 @@ async function loadProductDetails() {
             ? selectedColor.dataset.color
             : "";
 
-
-        // -------------------------
-        // SELECTED SIZE
-        // -------------------------
 
         const selectedSize =
           document.querySelector(
@@ -496,10 +587,6 @@ async function loadProductDetails() {
             : "";
 
 
-        // -------------------------
-        // ORDER MESSAGE
-        // -------------------------
-
         const orderMessage =
           document.getElementById(
             "orderMessage"
@@ -512,10 +599,6 @@ async function loadProductDetails() {
           );
 
 
-        // -------------------------
-        // DISABLE BUTTON
-        // -------------------------
-
         placeOrderButton.disabled = true;
 
         placeOrderButton.textContent =
@@ -523,10 +606,6 @@ async function loadProductDetails() {
 
 
         try {
-
-          // =========================
-          // INSERT ORDER INTO SUPABASE
-          // =========================
 
           const orderData = {
 
@@ -580,10 +659,6 @@ async function loadProductDetails() {
             );
 
 
-          // =========================
-          // CHECK RESPONSE
-          // =========================
-
           if (!orderResponse.ok) {
 
             const errorText =
@@ -595,10 +670,6 @@ async function loadProductDetails() {
 
           }
 
-
-          // =========================
-          // SUCCESS
-          // =========================
 
           orderMessage.innerHTML = `
 
@@ -622,28 +693,16 @@ async function loadProductDetails() {
           `;
 
 
-          // -------------------------
-          // RESET FORM
-          // -------------------------
-
           document
             .getElementById("orderForm")
             .reset();
 
-
-          // -------------------------
-          // RESET QUANTITY
-          // -------------------------
 
           quantity = 1;
 
           quantityValue.textContent =
             "1";
 
-
-          // -------------------------
-          // RESET COLOR
-          // -------------------------
 
           const colorButtons =
             document.querySelectorAll(
@@ -662,10 +721,6 @@ async function loadProductDetails() {
 
           }
 
-
-          // -------------------------
-          // RESET SIZE
-          // -------------------------
 
           const sizeButtons =
             document.querySelectorAll(
