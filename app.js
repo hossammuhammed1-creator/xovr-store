@@ -132,7 +132,11 @@ async function loadProductDetails() {
     document.title =
       `${product.name || "Product"} — XOVR`;
 
+
+    // =========================
     // COLORS
+    // =========================
+
     const colors = product.colors
       ? product.colors
           .split(",")
@@ -140,7 +144,11 @@ async function loadProductDetails() {
           .filter(Boolean)
       : [];
 
+
+    // =========================
     // SIZES
+    // =========================
+
     const sizes = product.sizes
       ? product.sizes
           .split(",")
@@ -148,26 +156,39 @@ async function loadProductDetails() {
           .filter(Boolean)
       : [];
 
+
+    // =========================
+    // PRODUCT HTML
+    // =========================
+
     productDetail.innerHTML = `
 
       <div class="product-gallery">
+
         <img
           src="${product.image || ""}"
           alt="${escapeHTML(product.name || "XOVR Product")}"
         >
+
       </div>
+
 
       <div class="detail-copy">
 
-        <p class="eyebrow">XOVR / COLLECTION</p>
+        <p class="eyebrow">
+          XOVR / COLLECTION
+        </p>
+
 
         <h1>
           ${escapeHTML(product.name || "")}
         </h1>
 
+
         <p class="detail-price">
           ${product.price || ""} EGP
         </p>
+
 
         <p class="detail-desc">
           ${escapeHTML(
@@ -176,13 +197,21 @@ async function loadProductDetails() {
           )}
         </p>
 
+
         ${
           colors.length
             ? `
-              <p class="option-title">COLOR</p>
+              <p class="option-title">
+                COLOR
+              </p>
 
-              <div class="options" id="colorOptions">
+              <div
+                class="options"
+                id="colorOptions"
+              >
+
                 ${colors.map((color, index) => `
+
                   <button
                     type="button"
                     class="option ${index === 0 ? "active" : ""}"
@@ -190,19 +219,29 @@ async function loadProductDetails() {
                   >
                     ${escapeHTML(color)}
                   </button>
+
                 `).join("")}
+
               </div>
             `
             : ""
         }
 
+
         ${
           sizes.length
             ? `
-              <p class="option-title">SIZE</p>
+              <p class="option-title">
+                SIZE
+              </p>
 
-              <div class="options" id="sizeOptions">
+              <div
+                class="options"
+                id="sizeOptions"
+              >
+
                 ${sizes.map((size, index) => `
+
                   <button
                     type="button"
                     class="option ${index === 0 ? "active" : ""}"
@@ -210,15 +249,22 @@ async function loadProductDetails() {
                   >
                     ${escapeHTML(size)}
                   </button>
+
                 `).join("")}
+
               </div>
             `
             : ""
         }
 
-        <p class="option-title">QUANTITY</p>
+
+        <p class="option-title">
+          QUANTITY
+        </p>
+
 
         <div class="options">
+
           <button
             type="button"
             class="option active"
@@ -226,6 +272,7 @@ async function loadProductDetails() {
           >
             −
           </button>
+
 
           <button
             type="button"
@@ -235,6 +282,7 @@ async function loadProductDetails() {
             1
           </button>
 
+
           <button
             type="button"
             class="option active"
@@ -242,9 +290,14 @@ async function loadProductDetails() {
           >
             +
           </button>
+
         </div>
 
-        <form class="order-form" id="orderForm">
+
+        <form
+          class="order-form"
+          id="orderForm"
+        >
 
           <input
             type="text"
@@ -253,12 +306,14 @@ async function loadProductDetails() {
             required
           >
 
+
           <input
             type="tel"
             id="customerPhone"
             placeholder="Phone Number"
             required
           >
+
 
           <input
             type="text"
@@ -267,14 +322,17 @@ async function loadProductDetails() {
             required
           >
 
+
           <button
             type="submit"
             class="btn btn-light"
+            id="placeOrderButton"
           >
             PLACE ORDER
           </button>
 
         </form>
+
 
         <div
           id="orderMessage"
@@ -282,7 +340,9 @@ async function loadProductDetails() {
         ></div>
 
       </div>
+
     `;
+
 
     // =========================
     // COLOR SELECTION
@@ -301,6 +361,7 @@ async function loadProductDetails() {
             );
 
           button.classList.add("active");
+
         });
 
       });
@@ -323,6 +384,7 @@ async function loadProductDetails() {
             );
 
           button.classList.add("active");
+
         });
 
       });
@@ -337,23 +399,31 @@ async function loadProductDetails() {
     const quantityValue =
       document.getElementById("quantityValue");
 
+
     document
       .getElementById("quantityMinus")
       .addEventListener("click", () => {
 
         if (quantity > 1) {
+
           quantity--;
-          quantityValue.textContent = quantity;
+
+          quantityValue.textContent =
+            quantity;
+
         }
 
       });
+
 
     document
       .getElementById("quantityPlus")
       .addEventListener("click", () => {
 
         quantity++;
-        quantityValue.textContent = quantity;
+
+        quantityValue.textContent =
+          quantity;
 
       });
 
@@ -364,62 +434,294 @@ async function loadProductDetails() {
 
     document
       .getElementById("orderForm")
-      .addEventListener("submit", event => {
+      .addEventListener("submit", async event => {
 
         event.preventDefault();
 
+
+        // -------------------------
+        // CUSTOMER DATA
+        // -------------------------
+
         const name =
-          document.getElementById("customerName").value.trim();
+          document
+            .getElementById("customerName")
+            .value
+            .trim();
+
 
         const phone =
-          document.getElementById("customerPhone").value.trim();
+          document
+            .getElementById("customerPhone")
+            .value
+            .trim();
+
 
         const address =
-          document.getElementById("customerAddress").value.trim();
+          document
+            .getElementById("customerAddress")
+            .value
+            .trim();
+
+
+        // -------------------------
+        // SELECTED COLOR
+        // -------------------------
 
         const selectedColor =
           document.querySelector(
             "#colorOptions .option.active"
           );
 
-        const selectedSize =
-          document.querySelector(
-            "#sizeOptions .option.active"
-          );
 
         const color =
           selectedColor
             ? selectedColor.dataset.color
             : "";
 
+
+        // -------------------------
+        // SELECTED SIZE
+        // -------------------------
+
+        const selectedSize =
+          document.querySelector(
+            "#sizeOptions .option.active"
+          );
+
+
         const size =
           selectedSize
             ? selectedSize.dataset.size
             : "";
 
+
+        // -------------------------
+        // ORDER MESSAGE
+        // -------------------------
+
         const orderMessage =
-          document.getElementById("orderMessage");
+          document.getElementById(
+            "orderMessage"
+          );
 
-        orderMessage.innerHTML = `
-          <div class="success">
-            Thank you, ${escapeHTML(name)}.<br>
-            Your order for
-            <strong>${escapeHTML(product.name)}</strong>
-            has been received.
-          </div>
-        `;
 
-        console.log({
-          product: product.name,
-          productId: product.id,
-          price: product.price,
-          name: name,
-          phone: phone,
-          address: address,
-          color: color,
-          size: size,
-          quantity: quantity
-        });
+        const placeOrderButton =
+          document.getElementById(
+            "placeOrderButton"
+          );
+
+
+        // -------------------------
+        // DISABLE BUTTON
+        // -------------------------
+
+        placeOrderButton.disabled = true;
+
+        placeOrderButton.textContent =
+          "PLACING ORDER...";
+
+
+        try {
+
+          // =========================
+          // INSERT ORDER INTO SUPABASE
+          // =========================
+
+          const orderData = {
+
+            product_id: product.id,
+
+            product_name: product.name,
+
+            price: product.price,
+
+            customer_name: name,
+
+            customer_phone: phone,
+
+            customer_address: address,
+
+            color: color,
+
+            size: size,
+
+            quantity: quantity
+
+          };
+
+
+          const orderResponse =
+            await fetch(
+              `${SUPABASE_URL}/rest/v1/orders`,
+              {
+
+                method: "POST",
+
+                headers: {
+
+                  apikey: SUPABASE_KEY,
+
+                  Authorization:
+                    `Bearer ${SUPABASE_KEY}`,
+
+                  "Content-Type":
+                    "application/json",
+
+                  Prefer:
+                    "return=minimal"
+
+                },
+
+                body:
+                  JSON.stringify(orderData)
+
+              }
+            );
+
+
+          // =========================
+          // CHECK RESPONSE
+          // =========================
+
+          if (!orderResponse.ok) {
+
+            const errorText =
+              await orderResponse.text();
+
+            throw new Error(
+              errorText
+            );
+
+          }
+
+
+          // =========================
+          // SUCCESS
+          // =========================
+
+          orderMessage.innerHTML = `
+
+            <div class="success">
+
+              Thank you,
+              ${escapeHTML(name)}.
+
+              <br><br>
+
+              Your order for
+
+              <strong>
+                ${escapeHTML(product.name)}
+              </strong>
+
+              has been received.
+
+            </div>
+
+          `;
+
+
+          // -------------------------
+          // RESET FORM
+          // -------------------------
+
+          document
+            .getElementById("orderForm")
+            .reset();
+
+
+          // -------------------------
+          // RESET QUANTITY
+          // -------------------------
+
+          quantity = 1;
+
+          quantityValue.textContent =
+            "1";
+
+
+          // -------------------------
+          // RESET COLOR
+          // -------------------------
+
+          const colorButtons =
+            document.querySelectorAll(
+              "#colorOptions .option"
+            );
+
+
+          if (colorButtons.length) {
+
+            colorButtons.forEach(btn =>
+              btn.classList.remove("active")
+            );
+
+            colorButtons[0]
+              .classList.add("active");
+
+          }
+
+
+          // -------------------------
+          // RESET SIZE
+          // -------------------------
+
+          const sizeButtons =
+            document.querySelectorAll(
+              "#sizeOptions .option"
+            );
+
+
+          if (sizeButtons.length) {
+
+            sizeButtons.forEach(btn =>
+              btn.classList.remove("active")
+            );
+
+            sizeButtons[0]
+              .classList.add("active");
+
+          }
+
+
+          placeOrderButton.disabled =
+            false;
+
+          placeOrderButton.textContent =
+            "PLACE ORDER";
+
+
+        } catch (error) {
+
+          console.error(
+            "ORDER ERROR:",
+            error
+          );
+
+
+          orderMessage.innerHTML = `
+
+            <div class="error">
+
+              Something went wrong.
+
+              <br>
+
+              Please try again.
+
+            </div>
+
+          `;
+
+
+          placeOrderButton.disabled =
+            false;
+
+          placeOrderButton.textContent =
+            "PLACE ORDER";
+
+        }
 
       });
 
@@ -429,6 +731,7 @@ async function loadProductDetails() {
 
     productDetail.innerHTML =
       "<p>Could not load product.</p>";
+
   }
 }
 
@@ -438,9 +741,15 @@ async function loadProductDetails() {
 // =========================
 
 function escapeHTML(value) {
-  const div = document.createElement("div");
-  div.textContent = value;
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    value ?? "";
+
   return div.innerHTML;
+
 }
 
 
@@ -449,4 +758,5 @@ function escapeHTML(value) {
 // =========================
 
 loadProducts();
+
 loadProductDetails();
