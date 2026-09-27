@@ -629,6 +629,184 @@ async function loadProducts() {
 
 
 // =========================
+// ORDERS
+// =========================
+
+async function loadOrders() {
+
+  let ordersSection =
+    document.getElementById("ordersSection");
+
+  // Create orders section if it doesn't exist
+  if (!ordersSection) {
+
+    ordersSection =
+      document.createElement("section");
+
+    ordersSection.id =
+      "ordersSection";
+
+    ordersSection.className =
+      "products-section";
+
+    ordersSection.innerHTML = `
+      <h2>Orders</h2>
+
+      <div id="ordersList">
+        Loading orders...
+      </div>
+    `;
+
+    document
+      .getElementById("adminPanel")
+      .appendChild(ordersSection);
+  }
+
+
+  const list =
+    document.getElementById("ordersList");
+
+  list.innerHTML =
+    "Loading orders...";
+
+
+  try {
+
+    const response = await fetch(
+
+      `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
+
+      {
+        headers: {
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        await response.text()
+      );
+    }
+
+
+    const orders =
+      await response.json();
+
+
+    if (!orders.length) {
+
+      list.innerHTML =
+        "<p>No orders yet.</p>";
+
+      return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    orders.forEach(order => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "order-item";
+
+
+      const date =
+        order.created_at
+          ? new Date(order.created_at)
+              .toLocaleString()
+          : "";
+
+
+      item.innerHTML = `
+
+        <div style="
+          padding:15px;
+          margin-bottom:15px;
+          border:1px solid #ddd;
+          border-radius:10px;
+        ">
+
+          <h3>
+            ${order.product_name || "Product"}
+          </h3>
+
+          <p>
+            <strong>Customer:</strong>
+            ${order.customer_name || ""}
+          </p>
+
+          <p>
+            <strong>Phone:</strong>
+            ${order.customer_phone || ""}
+          </p>
+
+          <p>
+            <strong>Address:</strong>
+            ${order.customer_address || ""}
+          </p>
+
+          <p>
+            <strong>Color:</strong>
+            ${order.color || ""}
+          </p>
+
+          <p>
+            <strong>Size:</strong>
+            ${order.size || ""}
+          </p>
+
+          <p>
+            <strong>Quantity:</strong>
+            ${order.quantity || ""}
+          </p>
+
+          <p>
+            <strong>Price:</strong>
+            ${order.price || ""}
+          </p>
+
+          <p>
+            <strong>Order ID:</strong>
+            ${order.id || ""}
+          </p>
+
+          <p>
+            <strong>Date:</strong>
+            ${date}
+          </p>
+
+        </div>
+
+      `;
+
+
+      list.appendChild(item);
+
+    });
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    list.innerHTML =
+      "<p>Could not load orders.</p>";
+  }
+}
+// =========================
 // INITIAL STATE
 // =========================
 
