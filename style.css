@@ -355,10 +355,12 @@ footer {
   letter-spacing: 0.18em;
 }
 /* ================= PRODUCT PAGE ================= */
+
 .product-page {
   min-height: calc(100vh - 150px);
   padding: 70px 5vw;
 }
+
 .product-detail {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -366,50 +368,92 @@ footer {
   max-width: 1200px;
   margin: auto;
 }
+
+/* PRODUCT GALLERY */
+
 .product-gallery {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
-.product-gallery img {
-  width: 75%;
-  max-width: 250px;
+.main-product-image {
+  width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  display: block;
   background: #111;
 }
+
+/* SMALL THUMBNAILS */
+
+.product-thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.product-thumbnail {
+  width: 72px;
+  height: 90px;
+  flex: 0 0 72px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  background: #111;
+  border: 1px solid #333;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.product-thumbnail:hover {
+  opacity: 1;
+}
+
+.product-thumbnail.active {
+  opacity: 1;
+  border-color: #fff;
+}
+
 .detail-copy {
   align-self: center;
 }
+
 .detail-copy h1 {
   font-size: clamp(45px, 6vw, 80px);
   line-height: 0.95;
   letter-spacing: -0.06em;
   margin: 0 0 15px;
 }
+
 .detail-price {
   font-size: 20px;
   font-weight: 700;
   margin: 0 0 28px;
 }
+
 .detail-desc {
   color: #999;
   line-height: 1.7;
   font-size: 14px;
   max-width: 480px;
 }
+
 .option-title {
   font-size: 10px;
   letter-spacing: 0.18em;
   font-weight: 800;
   margin: 30px 0 10px;
 }
+
 .options {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
+
 .option {
   background: transparent;
   color: #fff;
@@ -418,16 +462,19 @@ footer {
   cursor: pointer;
   font-size: 11px;
 }
+
 .option.active {
   background: #fff;
   color: #000;
   border-color: #fff;
 }
+
 .order-form {
   margin-top: 32px;
   display: grid;
   gap: 10px;
 }
+
 .order-form input {
   background: #0e0e0e;
   border: 1px solid #333;
@@ -435,9 +482,11 @@ footer {
   padding: 14px;
   outline: none;
 }
+
 .order-form button {
   margin-top: 8px;
 }
+
 .success {
   padding: 14px;
   border: 1px solid #444;
