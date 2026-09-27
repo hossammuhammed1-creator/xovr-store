@@ -60,6 +60,7 @@ function login() {
   $("adminPanel").style.display = "block";
 
   loadProducts();
+  loadorders();
 }
 
 
