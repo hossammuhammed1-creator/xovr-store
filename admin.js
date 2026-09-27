@@ -36,10 +36,8 @@ function login() {
   const loginMessage = $("loginMessage");
 
   if (!username || !password) {
-
     loginMessage.textContent =
       "Please enter username and password.";
-
     return;
   }
 
@@ -47,10 +45,8 @@ function login() {
     username !== ADMIN_USERNAME ||
     password !== ADMIN_PASSWORD
   ) {
-
     loginMessage.textContent =
       "Wrong username or password.";
-
     return;
   }
 
@@ -80,26 +76,78 @@ function logout() {
 
 
 // =========================
+// UPLOAD IMAGE
+// =========================
+
+async function uploadImage(file) {
+
+  const fileName =
+    Date.now() + "_" +
+    Math.random().toString(36).substring(2, 8) + "_" +
+    file.name.replace(/\s+/g, "-");
+
+  const response = await fetch(
+
+    `${SUPABASE_URL}/storage/v1/object/product-images/${fileName}`,
+
+    {
+      method: "POST",
+
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": file.type
+      },
+
+      body: file
+    }
+  );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Image upload failed: " +
+      await response.text()
+    );
+  }
+
+  return `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
+}
+
+
+// =========================
 // ADD / UPDATE PRODUCT
 // =========================
 
 async function addProduct() {
 
-  const name = $("productName").value.trim();
-  const price = $("productPrice").value.trim();
-  const description = $("productDescription").value.trim();
-  const colors = $("productColors").value.trim();
-  const sizes = $("productSizes").value.trim();
+  const name =
+    $("productName").value.trim();
 
-  const status = $("status");
+  const price =
+    $("productPrice").value.trim();
+
+  const description =
+    $("productDescription").value.trim();
+
+  const colors =
+    $("productColors").value.trim();
+
+  const sizes =
+    $("productSizes").value.trim();
+
+  const status =
+    $("status");
 
   if (!name) {
-    status.textContent = "Please enter product name.";
+    status.textContent =
+      "Please enter product name.";
     return;
   }
 
   if (!price) {
-    status.textContent = "Please enter price.";
+    status.textContent =
+      "Please enter price.";
     return;
   }
 
@@ -107,49 +155,57 @@ async function addProduct() {
 
     let imageUrl = null;
 
+    // =========================
+    // MAIN IMAGE
+    // =========================
+
     if (selectedImage) {
 
-      status.textContent = "Uploading image...";
-
-      const fileName =
-        Date.now() + "_" +
-        selectedImage.name.replace(/\s+/g, "-");
-
-      const uploadResponse = await fetch(
-
-        `${SUPABASE_URL}/storage/v1/object/product-images/${fileName}`,
-
-        {
-          method: "POST",
-
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": selectedImage.type
-          },
-
-          body: selectedImage
-        }
-      );
-
-      if (!uploadResponse.ok) {
-
-        const errorText =
-          await uploadResponse.text();
-
-        throw new Error(
-          "Image upload failed: " + errorText
-        );
-      }
+      status.textContent =
+        "Uploading main image...";
 
       imageUrl =
-        `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
+        await uploadImage(selectedImage);
     }
 
 
+    // =========================
+    // ADDITIONAL IMAGES
+    // =========================
+
+    let additionalImageUrls = [];
+
+    const additionalImages =
+      $("additionalImages");
+
+    if (
+      additionalImages &&
+      additionalImages.files.length > 0
+    ) {
+
+      status.textContent =
+        "Uploading additional images...";
+
+      for (
+        const file of additionalImages.files
+      ) {
+
+        const url =
+          await uploadImage(file);
+
+        additionalImageUrls.push(url);
+      }
+    }
+
+
+    // =========================
+    // UPDATE PRODUCT
+    // =========================
+
     if (editingProductId) {
 
-      status.textContent = "Updating product...";
+      status.textContent =
+        "Updating product...";
 
       const updateData = {
 
@@ -160,27 +216,48 @@ async function addProduct() {
         sizes: sizes
       };
 
+
       if (imageUrl) {
-        updateData.image = imageUrl;
+
+        updateData.image =
+          imageUrl;
       }
 
-      const response = await fetch(
 
-        `${SUPABASE_URL}/rest/v1/products?id=eq.${editingProductId}`,
+      if (additionalImageUrls.length > 0) {
 
-        {
-          method: "PATCH",
+        updateData.images =
+          JSON.stringify(additionalImageUrls);
+      }
 
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
 
-          body: JSON.stringify(updateData)
-        }
-      );
+      const response =
+        await fetch(
+
+          `${SUPABASE_URL}/rest/v1/products?id=eq.${editingProductId}`,
+
+          {
+            method: "PATCH",
+
+            headers: {
+
+              "apikey": SUPABASE_KEY,
+
+              "Authorization":
+                `Bearer ${SUPABASE_KEY}`,
+
+              "Content-Type":
+                "application/json",
+
+              "Prefer":
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(updateData)
+          }
+        );
+
 
       if (!response.ok) {
 
@@ -190,48 +267,82 @@ async function addProduct() {
         );
       }
 
+
       status.textContent =
         "Product updated successfully!";
 
-    } else {
+    }
+
+
+    // =========================
+    // NEW PRODUCT
+    // =========================
+
+    else {
 
       if (!imageUrl) {
 
         status.textContent =
-          "Please choose an image.";
+          "Please choose a main image.";
 
         return;
       }
 
+
       status.textContent =
         "Saving product...";
 
-      const response = await fetch(
 
-        `${SUPABASE_URL}/rest/v1/products`,
+      const response =
+        await fetch(
 
-        {
-          method: "POST",
+          `${SUPABASE_URL}/rest/v1/products`,
 
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
+          {
+            method: "POST",
 
-          body: JSON.stringify({
+            headers: {
 
-            name: name,
-            price: Number(price),
-            description: description,
-            image: imageUrl,
-            colors: colors,
-            sizes: sizes
+              "apikey": SUPABASE_KEY,
 
-          })
-        }
-      );
+              "Authorization":
+                `Bearer ${SUPABASE_KEY}`,
+
+              "Content-Type":
+                "application/json",
+
+              "Prefer":
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify({
+
+                name: name,
+
+                price:
+                  Number(price),
+
+                description:
+                  description,
+
+                image:
+                  imageUrl,
+
+                images:
+                  JSON.stringify(
+                    additionalImageUrls
+                  ),
+
+                colors:
+                  colors,
+
+                sizes:
+                  sizes
+              })
+          }
+        );
+
 
       if (!response.ok) {
 
@@ -241,11 +352,14 @@ async function addProduct() {
         );
       }
 
+
       status.textContent =
         "Product added successfully!";
     }
 
+
     resetProductForm();
+
     loadProducts();
 
   }
@@ -255,7 +369,8 @@ async function addProduct() {
     console.error(error);
 
     status.textContent =
-      "Error: " + error.message;
+      "Error: " +
+      error.message;
   }
 }
 
@@ -266,7 +381,8 @@ async function addProduct() {
 
 function editProduct(product) {
 
-  editingProductId = product.id;
+  editingProductId =
+    product.id;
 
   $("productName").value =
     product.name || "";
@@ -285,21 +401,29 @@ function editProduct(product) {
 
   $("mainImage").value = "";
 
+  if ($("additionalImages")) {
+    $("additionalImages").value = "";
+  }
+
   selectedImage = null;
 
   $("status").textContent =
-    "Editing: " + product.name;
+    "Editing: " +
+    product.name;
 
   const saveButton =
     document.querySelector(".save-btn");
 
   if (saveButton) {
+
     saveButton.textContent =
       "UPDATE PRODUCT";
   }
 
   window.scrollTo({
+
     top: 0,
+
     behavior: "smooth"
   });
 }
@@ -309,7 +433,10 @@ function editProduct(product) {
 // DELETE PRODUCT
 // =========================
 
-async function deleteProduct(id, name) {
+async function deleteProduct(
+  id,
+  name
+) {
 
   const confirmed =
     confirm(
@@ -322,20 +449,28 @@ async function deleteProduct(id, name) {
 
   try {
 
-    const response = await fetch(
+    const response =
+      await fetch(
 
-      `${SUPABASE_URL}/rest/v1/products?id=eq.${id}`,
+        `${SUPABASE_URL}/rest/v1/products?id=eq.${id}`,
 
-      {
-        method: "DELETE",
+        {
+          method: "DELETE",
 
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Prefer": "return=minimal"
+          headers: {
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`,
+
+            "Prefer":
+              "return=minimal"
+          }
         }
-      }
-    );
+      );
+
 
     if (!response.ok) {
 
@@ -343,6 +478,7 @@ async function deleteProduct(id, name) {
         await response.text()
       );
     }
+
 
     $("status").textContent =
       "Product deleted successfully!";
@@ -356,7 +492,8 @@ async function deleteProduct(id, name) {
     console.error(error);
 
     $("status").textContent =
-      "Delete error: " + error.message;
+      "Delete error: " +
+      error.message;
   }
 }
 
@@ -368,19 +505,31 @@ async function deleteProduct(id, name) {
 function resetProductForm() {
 
   $("productName").value = "";
+
   $("productPrice").value = "";
+
   $("productDescription").value = "";
+
   $("productColors").value = "";
+
   $("productSizes").value = "";
+
   $("mainImage").value = "";
 
+  if ($("additionalImages")) {
+    $("additionalImages").value = "";
+  }
+
   selectedImage = null;
+
   editingProductId = null;
+
 
   const saveButton =
     document.querySelector(".save-btn");
 
   if (saveButton) {
+
     saveButton.textContent =
       "SAVE PRODUCT";
   }
@@ -401,17 +550,23 @@ async function loadProducts() {
 
   try {
 
-    const response = await fetch(
+    const response =
+      await fetch(
 
-      `${SUPABASE_URL}/rest/v1/products?select=*`,
+        `${SUPABASE_URL}/rest/v1/products?select=*`,
 
-      {
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
+        {
+          headers: {
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`
+          }
         }
-      }
-    );
+      );
+
 
     if (!response.ok) {
 
@@ -420,10 +575,13 @@ async function loadProducts() {
       );
     }
 
+
     const products =
       await response.json();
 
+
     list.innerHTML = "";
+
 
     if (!products.length) {
 
@@ -433,78 +591,93 @@ async function loadProducts() {
       return;
     }
 
-    products.forEach(product => {
 
-      const item =
-        document.createElement("div");
+    products.forEach(
+      product => {
 
-      item.className =
-        "product-item";
+        const item =
+          document.createElement(
+            "div"
+          );
 
-      item.innerHTML = `
+        item.className =
+          "product-item";
 
-        <img
-          src="${product.image || ""}"
-          alt=""
-          style="
-            width:100px;
-            height:100px;
-            object-fit:cover;
-          "
-        >
 
-        <div>
+        item.innerHTML = `
 
-          <h3>
-            ${product.name || ""}
-          </h3>
+          <img
+            src="${product.image || ""}"
+            alt=""
+            style="
+              width:100px;
+              height:100px;
+              object-fit:cover;
+            "
+          >
 
-          <p>
-            Price: ${product.price || ""}
-          </p>
+          <div>
 
-          <p>
-            Colors: ${product.colors || ""}
-          </p>
+            <h3>
+              ${product.name || ""}
+            </h3>
 
-          <p>
-            Sizes: ${product.sizes || ""}
-          </p>
+            <p>
+              Price:
+              ${product.price || ""}
+            </p>
 
-          <div style="
-            margin-top:10px;
-            display:flex;
-            gap:8px;
-          ">
+            <p>
+              Colors:
+              ${product.colors || ""}
+            </p>
 
-            <button
-              onclick='editProduct(${JSON.stringify(product)})'
-              style="
-                padding:8px 14px;
-                cursor:pointer;
-              "
-            >
-              EDIT
-            </button>
+            <p>
+              Sizes:
+              ${product.sizes || ""}
+            </p>
 
-            <button
-              onclick='deleteProduct(${product.id}, ${JSON.stringify(product.name || "")})'
-              style="
-                padding:8px 14px;
-                cursor:pointer;
-              "
-            >
-              DELETE
-            </button>
+            <div style="
+              margin-top:10px;
+              display:flex;
+              gap:8px;
+            ">
+
+              <button
+                onclick='editProduct(${JSON.stringify(product)})'
+                style="
+                  padding:8px 14px;
+                  cursor:pointer;
+                "
+              >
+                EDIT
+              </button>
+
+              <button
+                onclick='deleteProduct(
+                  ${product.id},
+                  ${JSON.stringify(
+                    product.name || ""
+                  )}
+                )'
+                style="
+                  padding:8px 14px;
+                  cursor:pointer;
+                "
+              >
+                DELETE
+              </button>
+
+            </div>
 
           </div>
+        `;
 
-        </div>
-      `;
 
-      list.appendChild(item);
+        list.appendChild(item);
 
-    });
+      }
+    );
 
   }
 
@@ -525,18 +698,24 @@ async function loadProducts() {
 async function loadOrders() {
 
   let ordersSection =
-    document.getElementById("ordersSection");
+    document.getElementById(
+      "ordersSection"
+    );
+
 
   if (!ordersSection) {
 
     ordersSection =
-      document.createElement("section");
+      document.createElement(
+        "section"
+      );
 
     ordersSection.id =
       "ordersSection";
 
     ordersSection.className =
       "products-section";
+
 
     ordersSection.innerHTML = `
 
@@ -548,30 +727,43 @@ async function loadOrders() {
 
     `;
 
+
     document
       .getElementById("adminPanel")
-      .appendChild(ordersSection);
+      .appendChild(
+        ordersSection
+      );
   }
 
+
   const list =
-    document.getElementById("ordersList");
+    document.getElementById(
+      "ordersList"
+    );
 
   list.innerHTML =
     "Loading orders...";
 
+
   try {
 
-    const response = await fetch(
+    const response =
+      await fetch(
 
-      `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
+        `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
 
-      {
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
+        {
+          headers: {
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`
+          }
         }
-      }
-    );
+      );
+
 
     if (!response.ok) {
 
@@ -582,6 +774,7 @@ async function loadOrders() {
         "ORDERS ERROR:",
         errorText
       );
+
 
       list.innerHTML = `
 
@@ -594,7 +787,9 @@ async function loadOrders() {
           background:#fff5f5;
         ">
 
-          <strong>Orders Error:</strong>
+          <strong>
+            Orders Error:
+          </strong>
 
           <br><br>
 
@@ -607,8 +802,10 @@ async function loadOrders() {
       return;
     }
 
+
     const orders =
       await response.json();
+
 
     if (!orders.length) {
 
@@ -618,102 +815,131 @@ async function loadOrders() {
       return;
     }
 
+
     list.innerHTML = "";
 
-    orders.forEach(order => {
 
-      const item =
-        document.createElement("div");
+    orders.forEach(
+      order => {
 
-      item.className =
-        "order-item";
+        const item =
+          document.createElement(
+            "div"
+          );
 
-      const date =
-        order.created_at
-          ? new Date(order.created_at)
-              .toLocaleString()
-          : "";
+        item.className =
+          "order-item";
 
-      item.innerHTML = `
 
-        <div style="
-          padding:15px;
-          margin-bottom:15px;
-          border:1px solid #ddd;
-          border-radius:10px;
-        ">
+        const date =
+          order.created_at
+            ? new Date(
+                order.created_at
+              ).toLocaleString()
+            : "";
 
-          <h3>
-            ${order.product_name || "Product"}
-          </h3>
 
-          <p>
-            <strong>Customer:</strong>
-            ${order.customer_name || ""}
-          </p>
+        item.innerHTML = `
 
-          <p>
-            <strong>Phone:</strong>
-            ${order.customer_phone || ""}
-          </p>
+          <div style="
+            padding:15px;
+            margin-bottom:15px;
+            border:1px solid #ddd;
+            border-radius:10px;
+          ">
 
-          <p>
-            <strong>Address:</strong>
-            ${order.customer_address || ""}
-          </p>
+            <h3>
+              ${order.product_name || "Product"}
+            </h3>
 
-          <p>
-            <strong>Color:</strong>
-            ${order.color || ""}
-          </p>
+            <p>
+              <strong>
+                Customer:
+              </strong>
+              ${order.customer_name || ""}
+            </p>
 
-          <p>
-            <strong>Size:</strong>
-            ${order.size || ""}
-          </p>
+            <p>
+              <strong>
+                Phone:
+              </strong>
+              ${order.customer_phone || ""}
+            </p>
 
-          <p>
-            <strong>Quantity:</strong>
-            ${order.quantity || ""}
-          </p>
+            <p>
+              <strong>
+                Address:
+              </strong>
+              ${order.customer_address || ""}
+            </p>
 
-          <p>
-            <strong>Price:</strong>
-            ${order.price || ""}
-          </p>
+            <p>
+              <strong>
+                Color:
+              </strong>
+              ${order.color || ""}
+            </p>
 
-          <p>
-            <strong>Order ID:</strong>
-            ${order.id || ""}
-          </p>
+            <p>
+              <strong>
+                Size:
+              </strong>
+              ${order.size || ""}
+            </p>
 
-          <p>
-            <strong>Date:</strong>
-            ${date}
-          </p>
+            <p>
+              <strong>
+                Quantity:
+              </strong>
+              ${order.quantity || ""}
+            </p>
 
-          <button
-            onclick="deleteOrder(${order.id})"
-            style="
-              margin-top:10px;
-              padding:10px 16px;
-              background:#000;
-              color:#fff;
-              border:none;
-              border-radius:6px;
-              cursor:pointer;
-            "
-          >
-            DELETE ORDER
-          </button>
+            <p>
+              <strong>
+                Price:
+              </strong>
+              ${order.price || ""}
+            </p>
 
-        </div>
+            <p>
+              <strong>
+                Order ID:
+              </strong>
+              ${order.id || ""}
+            </p>
 
-      `;
+            <p>
+              <strong>
+                Date:
+              </strong>
+              ${date}
+            </p>
 
-      list.appendChild(item);
 
-    });
+            <button
+              onclick="deleteOrder(${order.id})"
+              style="
+                margin-top:10px;
+                padding:10px 16px;
+                background:#000;
+                color:#fff;
+                border:none;
+                border-radius:6px;
+                cursor:pointer;
+              "
+            >
+              DELETE ORDER
+            </button>
+
+          </div>
+
+        `;
+
+
+        list.appendChild(item);
+
+      }
+    );
 
   }
 
@@ -730,8 +956,12 @@ async function loadOrders() {
         border-radius:10px;
       ">
 
-        <strong>Orders Error:</strong>
+        <strong>
+          Orders Error:
+        </strong>
+
         <br><br>
+
         ${error.message}
 
       </div>
@@ -756,32 +986,45 @@ async function deleteOrder(id) {
     return;
   }
 
+
   try {
 
-    const response = await fetch(
+    const response =
+      await fetch(
 
-      `${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`,
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`,
 
-      {
-        method: "DELETE",
+        {
+          method: "DELETE",
 
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Prefer": "return=minimal"
+          headers: {
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization": `Bearer ${SUPABASE_KEY`,
+
+            "Prefer":
+              "return=minimal"
+          }
         }
-      }
-    );
+      );
+
 
     if (!response.ok) {
 
       const errorText =
         await response.text();
 
-      throw new Error(errorText);
+      throw new Error(
+        errorText
+      );
     }
 
-    alert("Order deleted successfully!");
+
+    alert(
+      "Order deleted successfully!"
+    );
 
     loadOrders();
 
@@ -803,4 +1046,5 @@ async function deleteOrder(id) {
 // INITIAL STATE
 // =========================
 
-$("adminPanel").style.display = "none";
+$("adminPanel").style.display =
+  "none";
