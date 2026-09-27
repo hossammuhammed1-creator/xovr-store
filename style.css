@@ -366,8 +366,15 @@ footer {
   max-width: 1200px;
   margin: auto;
 }
+.product-gallery {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .product-gallery img {
-  width: 100%;
+  width: 75%;
+  max-width: 480px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
   background: #111;
