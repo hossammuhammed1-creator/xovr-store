@@ -1,15 +1,20 @@
 const SUPABASE_URL = "https://eumcldmkvkcacsaybnxf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_BnPkZg1Hm8e0IVLYAZto-A_prOtX1aC";
 
+const ADMIN_USERNAME = "Muhammed hossam";
+const ADMIN_PASSWORD = "P101909714";
+
 const $ = (id) => document.getElementById(id);
 
 let selectedImage = null;
+
 
 // =========================
 // IMAGE SELECT
 // =========================
 
 $("mainImage").addEventListener("change", (e) => {
+
   selectedImage = e.target.files[0] || null;
 
   $("status").textContent = selectedImage
@@ -23,14 +28,32 @@ $("mainImage").addEventListener("change", (e) => {
 // =========================
 
 function login() {
-  const email = $("email").value.trim();
+
+  const username = $("email").value.trim();
   const password = $("password").value.trim();
 
-  if (!email || !password) {
-    $("loginMessage").textContent =
-      "Enter email and password.";
+  const loginMessage = $("loginMessage");
+
+  if (!username || !password) {
+
+    loginMessage.textContent =
+      "Please enter username and password.";
+
     return;
   }
+
+  if (
+    username !== ADMIN_USERNAME ||
+    password !== ADMIN_PASSWORD
+  ) {
+
+    loginMessage.textContent =
+      "Wrong username or password.";
+
+    return;
+  }
+
+  loginMessage.textContent = "";
 
   $("loginBox").style.display = "none";
   $("adminPanel").style.display = "block";
@@ -44,8 +67,13 @@ function login() {
 // =========================
 
 function logout() {
+
   $("adminPanel").style.display = "none";
   $("loginBox").style.display = "block";
+
+  $("email").value = "";
+  $("password").value = "";
+  $("loginMessage").textContent = "";
 }
 
 
@@ -56,34 +84,53 @@ function logout() {
 async function addProduct() {
 
   const name = $("productName").value.trim();
+
   const price = $("productPrice").value.trim();
+
   const description =
     $("productDescription").value.trim();
+
   const colors =
     $("productColors").value.trim();
+
   const sizes =
     $("productSizes").value.trim();
 
   const status = $("status");
 
+
   if (!name) {
-    status.textContent = "Please enter product name.";
+
+    status.textContent =
+      "Please enter product name.";
+
     return;
   }
+
 
   if (!price) {
-    status.textContent = "Please enter price.";
+
+    status.textContent =
+      "Please enter price.";
+
     return;
   }
 
+
   if (!selectedImage) {
-    status.textContent = "Please choose an image.";
+
+    status.textContent =
+      "Please choose an image.";
+
     return;
   }
+
 
   try {
 
-    status.textContent = "Uploading image...";
+    status.textContent =
+      "Uploading image...";
+
 
     // =========================
     // 1. UPLOAD IMAGE
@@ -93,22 +140,32 @@ async function addProduct() {
       Date.now() + "_" +
       selectedImage.name.replace(/\s+/g, "-");
 
+
     const uploadResponse = await fetch(
+
       `${SUPABASE_URL}/storage/v1/object/product-images/${fileName}`,
+
       {
         method: "POST",
 
         headers: {
+
           "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": selectedImage.type
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Content-Type":
+            selectedImage.type
         },
 
         body: selectedImage
       }
     );
 
+
     if (!uploadResponse.ok) {
+
       const errorText =
         await uploadResponse.text();
 
@@ -130,26 +187,43 @@ async function addProduct() {
     // 3. SAVE PRODUCT
     // =========================
 
-    status.textContent = "Saving product...";
+    status.textContent =
+      "Saving product...";
+
 
     const productResponse = await fetch(
+
       `${SUPABASE_URL}/rest/v1/products`,
+
       {
         method: "POST",
 
         headers: {
+
           "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Content-Type":
+            "application/json",
+
+          "Prefer":
+            "return=minimal"
         },
 
         body: JSON.stringify({
+
           name: name,
+
           price: Number(price),
+
           description: description,
+
           image: imageUrl,
+
           colors: colors,
+
           sizes: sizes
         })
       }
@@ -176,13 +250,19 @@ async function addProduct() {
 
 
     $("productName").value = "";
+
     $("productPrice").value = "";
+
     $("productDescription").value = "";
+
     $("productColors").value = "";
+
     $("productSizes").value = "";
+
     $("mainImage").value = "";
 
     selectedImage = null;
+
 
     loadProducts();
 
@@ -204,24 +284,34 @@ async function addProduct() {
 
 async function loadProducts() {
 
-  const list = $("productsList");
+  const list =
+    $("productsList");
 
-  list.innerHTML = "Loading products...";
+  list.innerHTML =
+    "Loading products...";
+
 
   try {
 
     const response = await fetch(
+
       `${SUPABASE_URL}/rest/v1/products?select=*`,
+
       {
         headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`
         }
       }
     );
 
 
     if (!response.ok) {
+
       throw new Error(
         await response.text()
       );
@@ -230,6 +320,7 @@ async function loadProducts() {
 
     const products =
       await response.json();
+
 
     list.innerHTML = "";
 
@@ -248,15 +339,21 @@ async function loadProducts() {
       const item =
         document.createElement("div");
 
+
       item.className =
         "product-item";
+
 
       item.innerHTML = `
 
         <img
           src="${product.image || ""}"
           alt=""
-          style="width:100px;height:100px;object-fit:cover"
+          style="
+            width:100px;
+            height:100px;
+            object-fit:cover;
+          "
         >
 
         <div>
@@ -278,7 +375,9 @@ async function loadProducts() {
           </p>
 
         </div>
+
       `;
+
 
       list.appendChild(item);
 
