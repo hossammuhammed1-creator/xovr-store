@@ -729,8 +729,8 @@ footer {
 
 .product-gallery .main-product-image {
   display: block !important;
-  width: 100% !important;
-  max-width: 520px !important;
+  width: 80% !important;
+  max-width: 620px !important;
   height: auto !important;
   aspect-ratio: 4 / 5 !important;
   object-fit: cover !important;
