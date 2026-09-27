@@ -7,6 +7,7 @@ const ADMIN_PASSWORD = "P101909714";
 const $ = (id) => document.getElementById(id);
 
 let selectedImage = null;
+let editingProductId = null;
 
 
 // =========================
@@ -78,26 +79,18 @@ function logout() {
 
 
 // =========================
-// ADD PRODUCT
+// ADD / UPDATE PRODUCT
 // =========================
 
 async function addProduct() {
 
   const name = $("productName").value.trim();
-
   const price = $("productPrice").value.trim();
-
-  const description =
-    $("productDescription").value.trim();
-
-  const colors =
-    $("productColors").value.trim();
-
-  const sizes =
-    $("productSizes").value.trim();
+  const description = $("productDescription").value.trim();
+  const colors = $("productColors").value.trim();
+  const sizes = $("productSizes").value.trim();
 
   const status = $("status");
-
 
   if (!name) {
 
@@ -106,7 +99,6 @@ async function addProduct() {
 
     return;
   }
-
 
   if (!price) {
 
@@ -117,152 +109,215 @@ async function addProduct() {
   }
 
 
-  if (!selectedImage) {
-
-    status.textContent =
-      "Please choose an image.";
-
-    return;
-  }
-
-
   try {
 
-    status.textContent =
-      "Uploading image...";
+    let imageUrl = null;
 
 
     // =========================
-    // 1. UPLOAD IMAGE
+    // UPLOAD NEW IMAGE
     // =========================
 
-    const fileName =
-      Date.now() + "_" +
-      selectedImage.name.replace(/\s+/g, "-");
+    if (selectedImage) {
+
+      status.textContent =
+        "Uploading image...";
+
+      const fileName =
+        Date.now() + "_" +
+        selectedImage.name.replace(/\s+/g, "-");
 
 
-    const uploadResponse = await fetch(
+      const uploadResponse = await fetch(
 
-      `${SUPABASE_URL}/storage/v1/object/product-images/${fileName}`,
+        `${SUPABASE_URL}/storage/v1/object/product-images/${fileName}`,
 
-      {
-        method: "POST",
+        {
+          method: "POST",
 
-        headers: {
+          headers: {
 
-          "apikey": SUPABASE_KEY,
+            "apikey": SUPABASE_KEY,
 
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`,
 
-          "Content-Type":
-            selectedImage.type
-        },
+            "Content-Type":
+              selectedImage.type
+          },
 
-        body: selectedImage
-      }
-    );
-
-
-    if (!uploadResponse.ok) {
-
-      const errorText =
-        await uploadResponse.text();
-
-      throw new Error(
-        "Image upload failed: " + errorText
+          body: selectedImage
+        }
       );
+
+
+      if (!uploadResponse.ok) {
+
+        const errorText =
+          await uploadResponse.text();
+
+        throw new Error(
+          "Image upload failed: " + errorText
+        );
+      }
+
+
+      imageUrl =
+        `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
     }
 
 
     // =========================
-    // 2. IMAGE URL
+    // UPDATE PRODUCT
     // =========================
 
-    const imageUrl =
-      `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
+    if (editingProductId) {
+
+      status.textContent =
+        "Updating product...";
 
 
-    // =========================
-    // 3. SAVE PRODUCT
-    // =========================
+      const updateData = {
 
-    status.textContent =
-      "Saving product...";
+        name: name,
+
+        price: Number(price),
+
+        description: description,
+
+        colors: colors,
+
+        sizes: sizes
+      };
 
 
-    const productResponse = await fetch(
+      if (imageUrl) {
 
-      `${SUPABASE_URL}/rest/v1/products`,
-
-      {
-        method: "POST",
-
-        headers: {
-
-          "apikey": SUPABASE_KEY,
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "Content-Type":
-            "application/json",
-
-          "Prefer":
-            "return=minimal"
-        },
-
-        body: JSON.stringify({
-
-          name: name,
-
-          price: Number(price),
-
-          description: description,
-
-          image: imageUrl,
-
-          colors: colors,
-
-          sizes: sizes
-        })
+        updateData.image = imageUrl;
       }
-    );
 
 
-    if (!productResponse.ok) {
+      const response = await fetch(
 
-      const errorText =
-        await productResponse.text();
+        `${SUPABASE_URL}/rest/v1/products?id=eq.${editingProductId}`,
 
-      throw new Error(
-        "Product save failed: " + errorText
+        {
+          method: "PATCH",
+
+          headers: {
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`,
+
+            "Content-Type":
+              "application/json",
+
+            "Prefer":
+              "return=minimal"
+          },
+
+          body:
+            JSON.stringify(updateData)
+        }
       );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Product update failed: " +
+          await response.text()
+        );
+      }
+
+
+      status.textContent =
+        "Product updated successfully!";
+
     }
 
 
     // =========================
-    // 4. SUCCESS
+    // ADD NEW PRODUCT
     // =========================
 
-    status.textContent =
-      "Product added successfully!";
+    else {
+
+      if (!imageUrl) {
+
+        status.textContent =
+          "Please choose an image.";
+
+        return;
+      }
 
 
-    $("productName").value = "";
+      status.textContent =
+        "Saving product...";
 
-    $("productPrice").value = "";
 
-    $("productDescription").value = "";
+      const response = await fetch(
 
-    $("productColors").value = "";
+        `${SUPABASE_URL}/rest/v1/products`,
 
-    $("productSizes").value = "";
+        {
+          method: "POST",
 
-    $("mainImage").value = "";
+          headers: {
 
-    selectedImage = null;
+            "apikey":
+              SUPABASE_KEY,
 
+            "Authorization":
+              `Bearer ${SUPABASE_KEY}`,
+
+            "Content-Type":
+              "application/json",
+
+            "Prefer":
+              "return=minimal"
+          },
+
+          body: JSON.stringify({
+
+            name: name,
+
+            price: Number(price),
+
+            description: description,
+
+            image: imageUrl,
+
+            colors: colors,
+
+            sizes: sizes
+          })
+        }
+      );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Product save failed: " +
+          await response.text()
+        );
+      }
+
+
+      status.textContent =
+        "Product added successfully!";
+    }
+
+
+    // =========================
+    // RESET FORM
+    // =========================
+
+    resetProductForm();
 
     loadProducts();
 
@@ -274,6 +329,156 @@ async function addProduct() {
 
     status.textContent =
       "Error: " + error.message;
+  }
+}
+
+
+// =========================
+// EDIT PRODUCT
+// =========================
+
+function editProduct(product) {
+
+  editingProductId = product.id;
+
+  $("productName").value =
+    product.name || "";
+
+  $("productPrice").value =
+    product.price || "";
+
+  $("productDescription").value =
+    product.description || "";
+
+  $("productColors").value =
+    product.colors || "";
+
+  $("productSizes").value =
+    product.sizes || "";
+
+  $("mainImage").value = "";
+
+  selectedImage = null;
+
+
+  $("status").textContent =
+    "Editing: " + product.name;
+
+
+  const saveButton =
+    document.querySelector(".save-btn");
+
+  if (saveButton) {
+
+    saveButton.textContent =
+      "UPDATE PRODUCT";
+  }
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+// =========================
+// DELETE PRODUCT
+// =========================
+
+async function deleteProduct(id, name) {
+
+  const confirmed =
+    confirm(
+      `Delete "${name}"?\n\nThis cannot be undone.`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const response = await fetch(
+
+      `${SUPABASE_URL}/rest/v1/products?id=eq.${id}`,
+
+      {
+        method: "DELETE",
+
+        headers: {
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Prefer":
+            "return=minimal"
+        }
+      }
+    );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        await response.text()
+      );
+    }
+
+
+    $("status").textContent =
+      "Product deleted successfully!";
+
+
+    loadProducts();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    $("status").textContent =
+      "Delete error: " + error.message;
+  }
+}
+
+
+// =========================
+// RESET FORM
+// =========================
+
+function resetProductForm() {
+
+  $("productName").value = "";
+
+  $("productPrice").value = "";
+
+  $("productDescription").value = "";
+
+  $("productColors").value = "";
+
+  $("productSizes").value = "";
+
+  $("mainImage").value = "";
+
+  selectedImage = null;
+
+  editingProductId = null;
+
+
+  const saveButton =
+    document.querySelector(".save-btn");
+
+  if (saveButton) {
+
+    saveButton.textContent =
+      "SAVE PRODUCT";
   }
 }
 
@@ -363,16 +568,44 @@ async function loadProducts() {
           </h3>
 
           <p>
-            ${product.price || ""}
+            Price: ${product.price || ""}
           </p>
 
           <p>
-            ${product.colors || ""}
+            Colors: ${product.colors || ""}
           </p>
 
           <p>
-            ${product.sizes || ""}
+            Sizes: ${product.sizes || ""}
           </p>
+
+          <div style="
+            margin-top:10px;
+            display:flex;
+            gap:8px;
+          ">
+
+            <button
+              onclick='editProduct(${JSON.stringify(product)})'
+              style="
+                padding:8px 14px;
+                cursor:pointer;
+              "
+            >
+              EDIT
+            </button>
+
+            <button
+              onclick='deleteProduct(${product.id}, ${JSON.stringify(product.name || "")})'
+              style="
+                padding:8px 14px;
+                cursor:pointer;
+              "
+            >
+              DELETE
+            </button>
+
+          </div>
 
         </div>
 
