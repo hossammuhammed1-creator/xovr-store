@@ -374,7 +374,7 @@ footer {
 
 .product-gallery img {
   width: 75%;
-  max-width: 360px;
+  max-width: 250px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
   background: #111;
