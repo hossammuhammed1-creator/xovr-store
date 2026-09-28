@@ -718,146 +718,90 @@ footer {
     flex: 1;
   }
 }
-/* ================= PRODUCT GALLERY FIX ================= */
+/* ================= PRODUCT GALLERY FINAL ================= */
 
 .product-gallery {
-  display: block !important;
-  width: 100% !important;
-  max-width: 520px !important;
-  margin: 0 auto !important;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 .product-gallery .main-product-image {
-  display: block !important;
-  width: 80% !important;
-  max-width: 620px !important;
-  height: auto !important;
-  aspect-ratio: 4 / 5 !important;
-  object-fit: cover !important;
-  margin: 0 0 12px 0 !important;
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  margin: 0 auto 12px;
 }
 
 .product-gallery .product-thumbnails {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 10px !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0 0 5px;
 }
 
 .product-gallery .product-thumbnail {
-  display: block !important;
-  width: 70px !important;
-  min-width: 70px !important;
-  max-width: 70px !important;
-  height: 88px !important;
-  min-height: 88px !important;
-  max-height: 88px !important;
-  aspect-ratio: auto !important;
-  object-fit: cover !important;
-  margin: 0 !important;
-  cursor: pointer !important;
-  opacity: 0.6 !important;
-  border: 1px solid #333 !important;
+  flex: 0 0 70px;
+  width: 70px;
+  height: 88px;
+  object-fit: cover;
+  border: 1px solid #333;
+  opacity: 0.6;
+  cursor: pointer;
 }
 
 .product-gallery .product-thumbnail.active {
-  opacity: 1 !important;
-  border-color: #fff !important;
+  opacity: 1;
+  border-color: #fff;
 }
 
-/* MOBILE */
+/* ================= PRODUCT PAGE MOBILE ================= */
 
 @media (max-width: 800px) {
 
+  .product-page {
+    padding: 25px 18px 50px;
+  }
+
+  .product-detail {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
   .product-gallery {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
   }
 
   .product-gallery .main-product-image {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 4 / 5;
+    margin: 0 auto 10px;
+  }
+
+  .product-gallery .product-thumbnails {
+    justify-content: flex-start;
   }
 
   .product-gallery .product-thumbnail {
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-    height: 75px !important;
-    min-height: 75px !important;
-    max-height: 75px !important;
+    flex: 0 0 55px;
+    width: 55px;
+    height: 70px;
   }
 
-}
-/* FINAL PRODUCT GALLERY LAYOUT */
-
-.product-gallery {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  width: 100% !important;
-  max-width: 520px !important;
-  margin: 0 auto !important;
-}
-
-.product-gallery .main-product-image {
-  display: block !important;
-  width: 100% !important;
-  max-width: 520px !important;
-  height: auto !important;
-  aspect-ratio: 4 / 5 !important;
-  object-fit: cover !important;
-  margin: 0 0 12px 0 !important;
-}
-
-.product-gallery .product-thumbnails {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: flex-start !important;
-  align-items: flex-start !important;
-  gap: 8px !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: auto !important;
-}
-
-.product-gallery .product-thumbnail {
-  flex: 0 0 70px !important;
-  width: 70px !important;
-  min-width: 70px !important;
-  max-width: 70px !important;
-  height: 88px !important;
-  min-height: 88px !important;
-  max-height: 88px !important;
-  aspect-ratio: auto !important;
-  object-fit: cover !important;
-  margin: 0 !important;
-}
-
-/* MOBILE */
-
-@media (max-width: 800px) {
-
-  .product-gallery {
-    width: 100% !important;
-    max-width: 100% !important;
+  .detail-copy {
+    width: 100%;
   }
 
-  .product-gallery .main-product-image {
-    width: 100% !important;
-    max-width: 100% !important;
+  .detail-copy h1 {
+    font-size: 42px;
   }
 
-  .product-gallery .product-thumbnail {
-    flex: 0 0 55px !important;
-    width: 55px !important;
-    min-width: 55px !important;
-    max-width: 55px !important;
-    height: 70px !important;
-    min-height: 70px !important;
-    max-height: 70px !important;
-  }
 }
