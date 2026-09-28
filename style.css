@@ -779,9 +779,9 @@ footer {
   }
 
   .product-gallery .main-product-image {
-    width: 280px !important;
-    max-width: 280px !important;
-    height: 350px !important;
+    width: 250px !important;
+    max-width: 250px !important;
+    height: 300px !important;
     aspect-ratio: 4 / 5 !important;
     object-fit: cover !important;
     display: block !important;
@@ -789,8 +789,8 @@ footer {
   }
 
   .product-gallery .product-thumbnails {
-    width: 280px !important;
-    max-width: 280px !important;
+    width: 250px !important;
+    max-width: 250px !important;
     margin: 0 auto !important;
     display: flex !important;
     gap: 8px !important;
