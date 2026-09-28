@@ -260,7 +260,7 @@ textarea {
 
 /* ================= MOBILE ================= */
 
-@media (max-width: 800px) {
+@media (max-width: 200px) {
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
