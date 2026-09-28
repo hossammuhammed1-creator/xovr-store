@@ -811,3 +811,105 @@ footer {
     font-size: 42px;
   }
 }
+/* ================= PRODUCT IMAGE FINAL FIX ================= */
+
+.product-gallery .main-product-image {
+  width: 100% !important;
+  max-width: 100% !important;
+  aspect-ratio: 4 / 5 !important;
+  overflow: hidden !important;
+  margin: 0 0 12px 0 !important;
+  background: #111 !important;
+}
+
+.product-gallery .main-product-image img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: cover !important;
+}
+
+/* الصور الصغيرة */
+
+.product-gallery .product-thumbnail {
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.product-gallery .product-thumbnail img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: cover !important;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 800px) {
+
+  .product-page {
+    padding: 25px 18px 50px !important;
+  }
+
+  .product-detail {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+  }
+
+  .product-gallery {
+    width: 100% !important;
+    max-width: 280px !important;
+    margin: 0 auto !important;
+  }
+
+  .product-gallery .main-product-image {
+    width: 280px !important;
+    max-width: 280px !important;
+    height: 350px !important;
+    aspect-ratio: 4 / 5 !important;
+    overflow: hidden !important;
+    margin: 0 auto 10px !important;
+  }
+
+  .product-gallery .main-product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .product-gallery .product-thumbnails {
+    width: 280px !important;
+    max-width: 280px !important;
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    margin: 0 auto !important;
+  }
+
+  .product-gallery .product-thumbnail {
+    flex: 0 0 55px !important;
+    width: 55px !important;
+    min-width: 55px !important;
+    height: 70px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .product-gallery .product-thumbnail img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .detail-copy {
+    width: 100% !important;
+  }
+
+  .detail-copy h1 {
+    font-size: 42px !important;
+  }
+
+}
